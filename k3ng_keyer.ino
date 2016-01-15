@@ -1640,7 +1640,11 @@ void TC3_Handler ( void ) {
 
 #ifdef FEATURE_SLEEP
 void wakeup() {
-  detachInterrupt(0);
+  sleep_disable();
+  detachInterrupt (0);
+  #ifdef FEATURE_2_PADDLE_WAKE
+    detachInterrupt (1);
+  #endif //FEATURE_2_PADDLE_WAKE
 }
 #endif //FEATURE_SLEEP
 
@@ -1655,8 +1659,29 @@ void check_sleep(){
       last_config_write = 0;
       check_for_dirty_configuration();
     }
+
+    byte old_ADCSRA = ADCSRA;
+    // disable ADC to save power
+    ADCSRA = 0;
+
+    set_sleep_mode (SLEEP_MODE_PWR_DOWN);
+    sleep_enable();
+  
+    // Do not interrupt before we go to sleep, or the ISR will detach interrupts and we won't wake.
+    noInterrupts ();
+    attachInterrupt(0, wakeup, FALLING);
+    EIFR = bit (INTF0);  // clear flag for interrupt 0
+    #ifdef FEATURE_2_PADDLE_WAKE
+      attachInterrupt(1, wakeup, FALLING);
+      EIFR = bit (INTF1);  // clear flag for interrupt 1
+    #endif //FEATURE_2_PADDLE_WAKE
     
-    attachInterrupt(0, wakeup, LOW);
+    // turn off brown-out enable in software
+    // BODS must be set to one and BODSE must be set to zero within four clock cycles
+    MCUCR = bit (BODS) | bit (BODSE);
+    // The BODS bit is automatically cleared after three clock cycles
+    MCUCR = bit (BODS);
+    
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);
     sleep_enable();
     #ifdef DEBUG_SLEEP
@@ -1664,11 +1689,15 @@ void check_sleep(){
     delay(1000);
     #endif //DEBUG_SLEEP
 
-    sleep_mode();
+    sleep_cpu();
 
     // shhhhh! we are asleep here !!
 
-    sleep_disable();
+    // An interrupt on digital 2 or 3 will call the wake() interrupt service routine
+    // and then return us to here.
+
+    ADCSRA = old_ADCSRA;   // re-enable ADC conversion
+    
     last_activity_time = millis();     
     
     #ifdef DEBUG_SLEEP

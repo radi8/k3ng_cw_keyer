@@ -1,5 +1,5 @@
 // Initial and hardcoded settings
-#define initial_speed_wpm 26             // "factory default" keyer speed setting
+#define initial_speed_wpm 22             // "factory default" keyer speed setting
 #define initial_sidetone_freq 600        // "factory default" sidetone frequency setting
 #define hz_high_beep 1500                // frequency in hertz of high beep
 #define hz_low_beep 400                  // frequency in hertz of low beep
@@ -17,8 +17,8 @@
 #define initial_ptt_lead_time_tx6 0         // PTT lead time in mS
 #define initial_ptt_tail_time_tx6 10         // PTT tail time in mS
 #define initial_qrss_dit_length 1        // QRSS dit length in seconds
-#define initial_pot_wpm_low_value 13     // Potentiometer WPM fully CCW
-#define initial_pot_wpm_high_value 35    // Potentiometer WPM fully CW
+#define initial_pot_wpm_low_value 15     // Potentiometer WPM fully CCW
+#define initial_pot_wpm_high_value 30    // Potentiometer WPM fully CW
 #define wpm_limit_low 5
 #define wpm_limit_high 60
 #define potentiometer_change_threshold 0.9 // don't change the keyer speed until pot wpm has changed more than this
@@ -44,7 +44,7 @@
 #define program_memory_limit_consec_spaces 1
 #define serial_leading_zeros 1            // set to 1 to activate leading zeros in serial numbers (i.e. #1 = 001)
 #define serial_cut_numbers 0              // set to 1 to activate cut numbers in serial numbers (i.e. #10 = 1T, #19 = 1N)
-#define go_to_sleep_inactivity_time 10    // minutes - FEATURE_SLEEP
+#define go_to_sleep_inactivity_time 1     // minutes - FEATURE_SLEEP
 #define default_cmos_super_keyer_iambic_b_timing_percent 33 // use with FEATURE_CMOS_SUPER_KEYER_IAMBIC_B_TIMING; should be between 0 to 99 % (0% = true iambic b;100% = iambic a behavior)
 #define cw_echo_timing_factor 0.25
 #define potentiometer_always_on 0
@@ -64,7 +64,7 @@
 #if defined(FEATURE_COMMAND_BUTTONS) &&  !defined(FEATURE_PS2_KEYBOARD) && !defined(FEATURE_USB_KEYBOARD) && !defined(FEATURE_COMMAND_LINE_INTERFACE) && !defined(FEATURE_WINKEY_EMULATION)
   #define number_of_memories byte(analog_buttons_number_of_buttons-1)
 #else
-  #define number_of_memories byte(12)
+  #define number_of_memories byte(3)
 #endif
 
 #ifdef FEATURE_CAPACITIVE_PADDLE_PINS
