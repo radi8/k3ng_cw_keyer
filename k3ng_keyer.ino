@@ -1679,7 +1679,7 @@ void check_sleep(){
     // Do not interrupt before we go to sleep, or the ISR will detach interrupts and we won't wake.
     noInterrupts ();
 
-    // will be called when pin D2 goes low
+    // will be called when pin D2, D5 or A1 goes low
     attachInterrupt(0, wakeup, FALLING);
     EIFR = bit(INTF0);  // clear flag for interrupt 0
     PCIFR = 0; // Clear all pin change flags
@@ -1702,8 +1702,9 @@ void check_sleep(){
 
     // shhhhh! we are asleep here !!
 
-    // An interrupt on digital 2 or 3 will call the wake() interrupt service routine
-    // and then return us to here.
+    // An interrupt on digital 2 will call the wake() interrupt service routine
+    // and then return us to here while a change on D5 or A1 will vector to their
+    // interrupt handler and also return to here.
 
     detachInterrupt (0);
     PCICR  = 0;    //Turn off all ports
