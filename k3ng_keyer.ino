@@ -452,7 +452,7 @@ New fetures in this stable release:
       Winkey emulation pin config bug fix (Thanks, Gerd, DD4DA)
 */
 
-#define CODE_VERSION "2.2.2016010302"
+#define CODE_VERSION "2.2.2016011802"
 #define eeprom_magic_number 19
 
 #include <stdio.h>
