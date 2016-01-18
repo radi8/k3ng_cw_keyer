@@ -1642,10 +1642,19 @@ void TC3_Handler ( void ) {
 void wakeup() {
   sleep_disable();
   detachInterrupt (0);
-  #ifdef FEATURE_2_PADDLE_WAKE
-    detachInterrupt (1);
-  #endif //FEATURE_2_PADDLE_WAKE
-}
+}  // end of wakeup
+
+ISR (PCINT1_vect)
+  {
+  PCICR = 0;  // cancel pin change interrupts
+  sleep_disable();
+  } // end of ISR (PCINT1_vect)
+
+ISR (PCINT2_vect)
+  {
+  PCICR = 0;  // turn off all pin change interrupt ports
+  sleep_disable();
+  } // end of ISR (PCINT2_vect)
 #endif //FEATURE_SLEEP
 
 //-------------------------------------------------------------------------------------------------------
@@ -1669,12 +1678,14 @@ void check_sleep(){
   
     // Do not interrupt before we go to sleep, or the ISR will detach interrupts and we won't wake.
     noInterrupts ();
+
+    // will be called when pin D2 goes low
     attachInterrupt(0, wakeup, FALLING);
-    EIFR = bit (INTF0);  // clear flag for interrupt 0
-    #ifdef FEATURE_2_PADDLE_WAKE
-      attachInterrupt(1, wakeup, FALLING);
-      EIFR = bit (INTF1);  // clear flag for interrupt 1
-    #endif //FEATURE_2_PADDLE_WAKE
+    EIFR = bit(INTF0);  // clear flag for interrupt 0
+    PCIFR = 0; // Clear all pin change flags
+    PCICR  = 0b00000110;    //Turn on ports C and D only
+    PCMSK2 = bit(PCINT21);  //Turn on pin D5
+    PCMSK1 = bit(PCINT9);   //Turn on pin A1
     
     // turn off brown-out enable in software
     // BODS must be set to one and BODSE must be set to zero within four clock cycles
@@ -1682,13 +1693,11 @@ void check_sleep(){
     // The BODS bit is automatically cleared after three clock cycles
     MCUCR = bit (BODS);
     
-    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-    sleep_enable();
     #ifdef DEBUG_SLEEP
     debug_serial_port->println(F("check_sleep: entering sleep"));
     delay(1000);
     #endif //DEBUG_SLEEP
-
+    interrupts();
     sleep_cpu();
 
     // shhhhh! we are asleep here !!
@@ -1696,6 +1705,11 @@ void check_sleep(){
     // An interrupt on digital 2 or 3 will call the wake() interrupt service routine
     // and then return us to here.
 
+    detachInterrupt (0);
+    PCICR  = 0;    //Turn off all ports
+    PCMSK2 = 0;    //Turn off pin D5
+    PCMSK1 = 0;    //Turn off pin A1
+    
     ADCSRA = old_ADCSRA;   // re-enable ADC conversion
     
     last_activity_time = millis();     

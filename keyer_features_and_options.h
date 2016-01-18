@@ -24,7 +24,6 @@
 // #define FEATURE_LCD1602_N07DH      // http://linksprite.com/wiki/index.php5?title=16_X_2_LCD_Keypad_Shield_for_Arduino
 // #define FEATURE_CW_DECODER
 #define FEATURE_SLEEP                   // go to sleep after x minutes to conserve battery power (not compatible with Arduino DUE)
-#define FEATURE_2_PADDLE_WAKE           // Dit or Dah paddle will wake from sleep. Can't use PS2 keyboard with this feature
 // #define FEATURE_ROTARY_ENCODER          // rotary encoder speed control
 // #define FEATURE_CMOS_SUPER_KEYER_IAMBIC_B_TIMING
 // #define FEATURE_DIT_DAH_BUFFER_CONTROL
