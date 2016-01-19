@@ -1673,6 +1673,11 @@ void check_sleep(){
     // disable ADC to save power
     ADCSRA = 0;
 
+    #ifdef FEATURE_POTENTIOMETER
+      // switch voltage off potentiometer to save power
+      digitalWrite(pot_pwr_switch, LOW);
+    #endif // FEATURE_POTENTIOMETER
+
     set_sleep_mode (SLEEP_MODE_PWR_DOWN);
     sleep_enable();
   
@@ -1710,6 +1715,10 @@ void check_sleep(){
     PCICR  = 0;    //Turn off all ports
     PCMSK2 = 0;    //Turn off pin D5
     PCMSK1 = 0;    //Turn off pin A1
+    
+    #ifdef FEATURE_POTENTIOMETER
+      digitalWrite(pot_pwr_switch, HIGH); // switch voltage back onto potentiometer
+    #endif // FEATURE_POTENTIOMETER
     
     ADCSRA = old_ADCSRA;   // re-enable ADC conversion
     
@@ -10970,6 +10979,8 @@ void initialize_keyer_state(){
 void initialize_potentiometer(){
 
   #ifdef FEATURE_POTENTIOMETER
+  pinMode(pot_pwr_switch,OUTPUT);     // Supply +5V to potentiometer which can
+  digitalWrite(pot_pwr_switch, HIGH); // be switched off when asleep.
   pinMode(potentiometer,INPUT);
   pot_wpm_high_value = initial_pot_wpm_high_value;
   last_pot_wpm_read = pot_value_wpm();
